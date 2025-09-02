@@ -91,12 +91,34 @@ export class WhatsAppManager extends EventEmitter {
 
     client.on('message', async (message) => {
       session.lastActivity = new Date();
-      this.emit('message', { sessionName, message: message.toJSON() });
+      const msgData = {
+        id: (message as any).id?._serialized,
+        body: (message as any).body,
+        type: (message as any).type,
+        timestamp: (message as any).timestamp,
+        from: (message as any).from,
+        to: (message as any).to,
+        fromMe: (message as any).fromMe,
+        hasMedia: (message as any).hasMedia,
+        isForwarded: (message as any).isForwarded,
+      };
+      this.emit('message', { sessionName, message: msgData });
     });
 
     client.on('message_create', async (message) => {
       session.lastActivity = new Date();
-      this.emit('message_create', { sessionName, message: message.toJSON() });
+      const msgData = {
+        id: (message as any).id?._serialized,
+        body: (message as any).body,
+        type: (message as any).type,
+        timestamp: (message as any).timestamp,
+        from: (message as any).from,
+        to: (message as any).to,
+        fromMe: (message as any).fromMe,
+        hasMedia: (message as any).hasMedia,
+        isForwarded: (message as any).isForwarded,
+      };
+      this.emit('message_create', { sessionName, message: msgData });
     });
 
     this.sessions.set(sessionName, session);
