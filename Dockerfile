@@ -1,48 +1,53 @@
 FROM node:18-alpine
 
-# Install dependencies for whatsapp-web.js
+# تثبيت الحزم الأساسية وتشغيل Chromium بشكل سليم
 RUN apk add --no-cache \
     chromium \
     nss \
     freetype \
-    freetype-dev \
     harfbuzz \
     ca-certificates \
     ttf-freefont \
-    curl \
-    bash
+    mesa-libgbm \
+    udev \
+    dumb-init \
+    bash \
+    curl
 
-# Tell Puppeteer to skip installing Chromium. We'll be using the installed package.
+# إعداد Puppeteer لاستخدام Chromium المثبت
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 WORKDIR /app
 
-# Copy package files
+# نسخ ملفات الباكج والـ tsconfig
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# Install ALL dependencies (including devDependencies for build)
+# تثبيت كل الـ dependencies (مع devDependencies للبناء)
 RUN npm install
 
-# Copy source code
+# نسخ السورس
 COPY src/ ./src/
 
-# Build the application
+# بناء المشروع
 RUN npm run build
 
-# Remove devDependencies to reduce image size
+# إزالة devDependencies لتخفيف الحجم
 RUN npm prune --production
 
-# Create directory for session data
+# إنشاء مجلد للجلسات
 RUN mkdir -p /app/sessions
 
-# Expose port
+# تعريض البورت
 EXPOSE 3000
 
-# Health check
+# Healthcheck
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3000/health || exit 1
 
-# Start the application
+# تشغيل باستخدام dumb-init (لإدارة الـ signals بشكل صحيح)
+ENTRYPOINT ["dumb-init", "--"]
+
+# تشغيل التطبيق
 CMD ["npm", "start"]
