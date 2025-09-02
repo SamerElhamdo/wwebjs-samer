@@ -1,4 +1,6 @@
-import { Client, LocalAuth, MessageMedia } from 'whatsapp-web.js';
+// whatsapp-web.js is CommonJS; import via default then destructure
+import whatsappWebPkg from 'whatsapp-web.js';
+const { Client, LocalAuth, MessageMedia } = whatsappWebPkg as any;
 import * as qrcode from 'qrcode-terminal';
 import { EventEmitter } from 'events';
 
