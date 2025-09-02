@@ -243,7 +243,7 @@ export class WhatsAppManager extends EventEmitter {
               text: `Session "${sessionName}" is not ready. Please authenticate first.`
             }
           ]
-        ];
+        };
       }
 
       const chats = await session.client.getChats();
