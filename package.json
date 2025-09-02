@@ -1,0 +1,31 @@
+{
+  "name": "whatsapp-mcp-sse",
+  "version": "1.0.0",
+  "description": "MCP Server for WhatsApp Web JS with SSE support",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "watch": "tsx watch src/index.ts"
+  },
+  "keywords": ["mcp", "whatsapp", "webhook", "sse"],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "whatsapp-web.js": "^1.23.0",
+    "qrcode-terminal": "^0.12.0",
+    "dotenv": "^16.3.1",
+    "axios": "^1.6.0",
+    "@types/events": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "@types/express": "^4.17.17",
+    "@types/cors": "^2.8.14",
+    "@types/ws": "^8.5.5",
+    "typescript": "^5.2.2",
+    "tsx": "^3.14.0"
+  }
+}
