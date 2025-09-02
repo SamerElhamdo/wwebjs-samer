@@ -1,11 +1,12 @@
-// whatsapp-web.js is CommonJS; import via default then destructure
+// whatsapp-web.js is CommonJS; import runtime via default and types via type-only import
 import whatsappWebPkg from 'whatsapp-web.js';
+import type { Client as WWebClient, Message as WWebMessage, Contact as WWebContact, Chat as WWebChat } from 'whatsapp-web.js';
 const { Client, LocalAuth, MessageMedia } = whatsappWebPkg as any;
 import * as qrcode from 'qrcode-terminal';
 import { EventEmitter } from 'events';
 
 export interface WhatsAppSession {
-  client: Client;
+  client: WWebClient;
   isReady: boolean;
   qrCode: string | null;
   lastActivity: Date;
@@ -51,7 +52,7 @@ export class WhatsAppManager extends EventEmitter {
     };
 
     // Set up event listeners
-    client.on('qr', (qr) => {
+    client.on('qr', (qr: string) => {
       console.log('QR Code received for session:', sessionName);
       session.qrCode = qr;
       session.lastActivity = new Date();
@@ -78,12 +79,12 @@ export class WhatsAppManager extends EventEmitter {
       this.emit('authenticated', { sessionName });
     });
 
-    client.on('auth_failure', (msg) => {
+    client.on('auth_failure', (msg: string) => {
       console.error('Authentication failed for session:', sessionName, msg);
       this.emit('auth_failure', { sessionName, message: msg });
     });
 
-    client.on('disconnected', (reason) => {
+    client.on('disconnected', (reason: string) => {
       console.log('WhatsApp client disconnected for session:', sessionName, reason);
       session.isReady = false;
       session.lastActivity = new Date();
@@ -91,7 +92,7 @@ export class WhatsAppManager extends EventEmitter {
       this.emit('disconnected', { sessionName, reason });
     });
 
-    client.on('message', async (message) => {
+    client.on('message', async (message: WWebMessage) => {
       session.lastActivity = new Date();
       const msgData = {
         id: (message as any).id?._serialized,
@@ -107,7 +108,7 @@ export class WhatsAppManager extends EventEmitter {
       this.emit('message', { sessionName, message: msgData });
     });
 
-    client.on('message_create', async (message) => {
+    client.on('message_create', async (message: WWebMessage) => {
       session.lastActivity = new Date();
       const msgData = {
         id: (message as any).id?._serialized,
@@ -227,7 +228,7 @@ export class WhatsAppManager extends EventEmitter {
       }
 
       const contacts = await session.client.getContacts();
-      const contactsData = contacts.map(contact => ({
+      const contactsData = contacts.map((contact: WWebContact) => ({
         id: contact.id._serialized,
         name: contact.name || contact.pushname || 'Unknown',
         number: contact.number,
@@ -271,7 +272,7 @@ export class WhatsAppManager extends EventEmitter {
       }
 
       const chats = await session.client.getChats();
-      const chatsData = chats.map(chat => ({
+      const chatsData = chats.map((chat: WWebChat) => ({
         id: chat.id._serialized,
         name: chat.name,
         isGroup: chat.isGroup,
@@ -315,9 +316,9 @@ export class WhatsAppManager extends EventEmitter {
       }
 
       const chat = await session.client.getChatById(chatId);
-      const messages = await chat.fetchMessages({ limit });
+      const messages = await (chat as WWebChat).fetchMessages({ limit });
       
-      const messagesData = messages.map(message => ({
+      const messagesData = messages.map((message: WWebMessage) => ({
         id: message.id._serialized,
         body: message.body,
         type: message.type,
