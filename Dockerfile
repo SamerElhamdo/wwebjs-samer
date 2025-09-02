@@ -8,11 +8,12 @@ RUN apk add --no-cache \
     harfbuzz \
     ca-certificates \
     ttf-freefont \
-    mesa-libgbm \
+    mesa-gbm \
     udev \
     dumb-init \
     bash \
     curl
+
 
 # إعداد Puppeteer لاستخدام Chromium المثبت
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
